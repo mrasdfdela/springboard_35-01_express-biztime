@@ -1,13 +1,23 @@
 /** BizTime express application. */
 
-
 const express = require("express");
-
-const app = express();
+const db = require("./db");
+// const { router } = express.Router();
 const ExpressError = require("./expressError")
 
+const app = express();
 app.use(express.json());
 
+app.get("/", async function (req, res, next) {
+  try {
+    const results = await db.query(
+      `SELECT * FROM companies`
+    );
+    return res.json(results.rows);
+  } catch(err) {
+    return next(err);
+  } 
+});
 
 /** 404 handler */
 
