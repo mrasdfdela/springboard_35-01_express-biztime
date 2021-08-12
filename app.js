@@ -2,11 +2,13 @@
 
 const express = require("express");
 const app = express();
-const ExpressError = require("./expressError")
+const ExpressError = require("./expressError");
 
 app.use(express.json());
 const compRoutes = require("./routes/companies");
-app.use("/companies", compRoutes)
+const invRoutes = require("./routes/invoices");
+app.use("/companies", compRoutes);
+app.use("/invoices", invRoutes);
 
 // const db = require("./db");
 
