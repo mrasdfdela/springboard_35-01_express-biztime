@@ -35,7 +35,64 @@ describe("GET /companies", function(){
       companies: [testCompany] 
     });
   });
-})
+});
+
+describe("GET /companies/:code", function () {
+  test("get specific company", async function () {
+    const res = await request(app).get(`/companies/${testCompany.code}`);
+    testCompany.industries = [];
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toEqual({
+      company: testCompany ,
+    });
+  });
+});
+
+describe("POST /companies", function () {
+  test("post a new company", async function () {
+    const newCompany = {
+      name: "Chiquita Banana",
+      description: "Banana Republic",
+    };
+    const res = await request(app).post(`/companies`).send(newCompany);
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toEqual({
+      company: {
+        code: expect.any(String), 
+        name: newCompany.name,
+        description: newCompany.description
+      }
+    });
+  });
+});
+
+describe("Update (put) /companies/:code", function () {
+  test("Update a company", async function () {
+    const updatedCompany = {
+      name: "Kirkland",
+      description: "BC--Before Costco",
+    };
+    const res = await request(app)
+      .put(`/companies/${testCompany.code}`)
+      .send(updatedCompany);
+    expect(res.statusCode).toEqual(201);
+    expect(res.body).toEqual({
+      company: {
+        code: testCompany.code, 
+        name: updatedCompany.name,
+        description: updatedCompany.description
+      }
+    });
+  });
+});
+
+describe("Delete /companies/:code", function () {
+  test("Delete a company", async function () {
+    const res = await request(app)
+      .delete(`/companies/${testCompany.code}`);
+    expect(res.statusCode).toEqual(200);
+  });
+});
   
 afterEach(async function(){
   await db.query(`
