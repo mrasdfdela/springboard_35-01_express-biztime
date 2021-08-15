@@ -3,7 +3,7 @@ const router = express.Router();
 
 const db = require("../db");
 
-const { evalResults } = require("../helpers");
+const { evalResults, invoiceDt } = require("../helpers");
 
 router.get("/", async function (req, res, next) {
   try {
@@ -44,7 +44,7 @@ router.post("/", async function (req, res, next) {
     );
     evalResults(results, "Invalid invoice details!",400);
 
-    return res.json({ company: results.rows[0] });
+    return res.json({ invoice: results.rows[0] });
   } catch (err) {
     return next(err);
   }
@@ -52,17 +52,19 @@ router.post("/", async function (req, res, next) {
 
 router.put("/:id", async function (req, res, next) {
   try {
-    const { comp_code, amt, paid, add_date, paid_date } = req.body;
+    const { amt, paid } = req.body;
     const id = req.params.id;
+    const paid_date = await invoiceDt(id,paid);
+
     const results = await db.query(
       `UPDATE invoices 
-      SET comp_code=$2, amt=$3, paid=$4, add_date=$5, paid_date=$6
+      SET amt=$2, paid=$3, paid_date=$4
       WHERE id=$1
       RETURNING comp_code, amt, paid, add_date, paid_date`,
-      [id, comp_code, amt, paid, add_date, paid_date]
+      [id, amt, paid, paid_date]
     );
-    evalResults(results, "Warning: Invoice details not updated!",400);
-    return res.status(201).json({ company: results.rows[0] });
+    evalResults(results, "Warning: Invoice details not updated!",404);
+    return res.status(201).json({ invoice: results.rows[0] });
   } catch (err) {
     return next(err);
   }
