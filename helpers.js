@@ -41,10 +41,8 @@ function create_industry_promises(arr) {
 }
 
 async function await_industry_promises(promises, industries) {
-  console.log(`industries: ${industries}`)
   await Promise.all(promises)
     .then((res) => {
-      console.log(res);
       res.forEach((response, idx) =>{
         industries[idx].companies = response.rows
       });
